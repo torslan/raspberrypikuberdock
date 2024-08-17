@@ -1,0 +1,36 @@
+sudo apt-get update && sudo apt-get upgrade -y
+
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+--Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+--Enable Docker
+sudo systemctl enable docker
+sudo usermod -aG docker $USER
+
+--Set up Kubernetes(K3s)
+curl -sfL https://get.k3s.io | sh -
+
+sudo kubectl get nodes
+
+--If it fails producing [Failed to start k3s.service - Lightweight Kubernetes.Aug 16 21:34:11 kubertest k3s[1522]: time="2024-08-16T21:34:11-07:00" level=fatal msg="failed to find memory cgroup (v2)"
+Aug 16 21:34:11 kubertest systemd[1]: k3s.service: Main process exited, code=exited, status=1/FAILURE] follow next steps
+
+sudo nano /boot/firmware/cmdline.txt
+--edit text with 
+console=serial0,115200 console=tty1 root=PARTUUID=2a4bb5cd-02 rootfstype=ext4 fsck.repair=yes rootwait cfg80211.ieee80211_regdom=GB cgroup_memory=1 cgroup_enable=memory systemd.unified_cgroup_hierarchy=1
+
+-- Save ctl X, Y
+-- Reboot
+sudo reboot
+
+Test cgroup2
+
+mount | grep cgroup2
+if command shows that it is mounted then the configuation is successful and you can rerun kuberneters status cmd
+
+sudo systemctl restart k3s
+
+sudo systemctl status k3s
